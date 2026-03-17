@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SupportOps AI — Customer Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#f5f3ef; --surface:#fff; --surface2:#f0ede8;
+  --border:#e2ddd8; --border2:#d0c9c0;
+  --ink:#1a1714; --ink2:#6b6560; --ink3:#a09890;
+  --green:#1a7a4a; --green-bg:#e8f5ee;
+  --red:#c0392b; --red-bg:#fdf0ee;
+  --orange:#c45e00; --orange-bg:#fef3e8;
+  --radius:12px;
+  --shadow:0 1px 3px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.04);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;font-size:15px;line-height:1.6}
+
+/* NAV */
+nav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 40px;display:flex;align-items:center;justify-content:space-between;height:60px;position:sticky;top:0;z-index:100}
+.nav-logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:16px;letter-spacing:-.3px}
+.logo-mark{width:32px;height:32px;background:var(--ink);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--bg);font-size:16px}
+.nav-right{display:flex;align-items:center;gap:10px}
+.lang-btn{padding:5px 11px;border:1px solid var(--border);border-radius:6px;background:var(--surface);font-family:'DM Mono',monospace;font-size:11px;font-weight:500;color:var(--ink2);cursor:pointer;transition:all .15s;letter-spacing:.5px}
+.lang-btn:hover{border-color:var(--border2);color:var(--ink)}
+.lang-btn.active{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.status-pill{display:flex;align-items:center;gap:6px;padding:5px 12px;background:var(--green-bg);border:1px solid #b8dfc8;border-radius:20px;font-size:12px;font-weight:500;color:var(--green)}
+.status-dot{width:7px;height:7px;background:var(--green);border-radius:50%;animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* HERO */
+.hero{text-align:center;padding:64px 24px 0;max-width:600px;margin:0 auto}
+.hero-eyebrow{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);margin-bottom:12px}
+.hero-title{font-size:40px;font-weight:700;letter-spacing:-1.5px;line-height:1.15;margin-bottom:14px}
+.hero-sub{color:var(--ink2);font-size:16px;margin-bottom:48px;line-height:1.7}
+
+/* FORM */
+.form-wrap{max-width:560px;margin:0 auto;padding:0 24px 80px}
+.form-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:36px;box-shadow:var(--shadow)}
+.form-row{margin-bottom:20px}
+.form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+label{display:block;font-size:13px;font-weight:500;color:var(--ink);margin-bottom:6px}
+.label-required::after{content:' *';color:var(--red)}
+input,textarea{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;background:var(--surface);font-family:'DM Sans',sans-serif;font-size:14px;color:var(--ink);transition:border-color .15s,box-shadow .15s;outline:none}
+input:focus,textarea:focus{border-color:var(--ink);box-shadow:0 0 0 3px rgba(26,23,20,.08)}
+input::placeholder,textarea::placeholder{color:var(--ink3)}
+textarea{resize:vertical;min-height:140px;line-height:1.6}
+.submit-btn{width:100%;padding:14px;background:var(--ink);color:var(--bg);border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px}
+.submit-btn:hover{background:#2d2926;transform:translateY(-1px);box-shadow:var(--shadow)}
+.submit-btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
+
+/* RESULT */
+.result-card{display:none;margin-top:20px;padding:20px;border-radius:10px;border:1px solid}
+.result-card.success{background:var(--green-bg);border-color:#b8dfc8}
+.result-card.escalated{background:var(--orange-bg);border-color:#f0c898}
+.result-card.error{background:var(--red-bg);border-color:#f0c0b8}
+.result-icon{font-size:24px;margin-bottom:8px}
+.result-title{font-weight:700;font-size:16px;margin-bottom:6px}
+.result-body{font-size:14px;color:var(--ink2);line-height:1.6}
+.result-tid{font-family:'DM Mono',monospace;font-size:11px;margin-top:12px;padding-top:12px;border-top:1px solid rgba(0,0,0,.06);color:var(--ink3)}
+
+/* FEATURES */
+.features{display:flex;gap:24px;justify-content:center;padding:0 24px 64px;max-width:560px;margin:0 auto;flex-wrap:wrap}
+.feature{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink3)}
+.feature-icon{font-size:15px}
+
+@media(max-width:600px){
+  nav{padding:0 20px}
+  .hero{padding:40px 20px 0}
+  .hero-title{font-size:28px}
+  .form-wrap{padding:0 16px 60px}
+  .form-card{padding:24px}
+  .form-row-2{grid-template-columns:1fr}
+  .features{gap:16px}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">
+    <div class="logo-mark">⚡</div>
+    <span>SupportOps AI</span>
+  </div>
+  <div class="nav-right">
+    <button class="lang-btn active" onclick="setLang('en')" id="lang-en">EN</button>
+    <button class="lang-btn" onclick="setLang('es')" id="lang-es">ES</button>
+    <div class="status-pill">
+      <div class="status-dot"></div>
+      <span id="t-status">All systems operational</span>
+    </div>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-eyebrow" id="t-eyebrow">Customer Support</div>
+  <h1 class="hero-title" id="t-title">How can we<br>help you today?</h1>
+  <p class="hero-sub" id="t-sub">Send your request and our AI will classify and respond within seconds. For complex issues, a specialist will follow up.</p>
+</div>
+
+<div class="form-wrap">
+  <div class="form-card">
+    <div class="form-row-2">
+      <div>
+        <label class="label-required" id="t-lbl-name">Full name</label>
+        <input type="text" id="field-name" placeholder="John Smith">
+      </div>
+      <div>
+        <label class="label-required" id="t-lbl-email">Email address</label>
+        <input type="email" id="field-from" placeholder="you@company.com">
+      </div>
+    </div>
+    <div class="form-row">
+      <label class="label-required" id="t-lbl-subject">Subject</label>
+      <input type="text" id="field-subject" placeholder="Brief description of your issue">
+    </div>
+    <div class="form-row">
+      <label class="label-required" id="t-lbl-message">Message</label>
+      <textarea id="field-message" placeholder="Describe your issue in detail. The more context you provide, the better we can help."></textarea>
+    </div>
+    <button class="submit-btn" onclick="submitTicket()" id="submit-btn">
+      <span id="submit-text">Send Request</span>
+      <span id="submit-icon">→</span>
+    </button>
+    <div class="result-card" id="result-card">
+      <div class="result-icon" id="result-icon"></div>
+      <div class="result-title" id="result-title"></div>
+      <div class="result-body" id="result-body"></div>
+      <div class="result-tid" id="result-tid"></div>
+    </div>
+  </div>
+</div>
+
+<div class="features">
+  <div class="feature"><span class="feature-icon">⚡</span><span id="t-f1">AI-powered responses</span></div>
+  <div class="feature"><span class="feature-icon">🌐</span><span id="t-f2">Multi-language support</span></div>
+  <div class="feature"><span class="feature-icon">📧</span><span id="t-f3">Response via email</span></div>
+  <div class="feature"><span class="feature-icon">🔒</span><span id="t-f4">Secure & private</span></div>
+</div>
+
+<script>
+const WEBHOOK = 'http://localhost:5678/webhook/customer-support';
+
+const T = {
+  en:{
+    't-status':'All systems operational',
+    't-eyebrow':'Customer Support',
+    't-title':'How can we<br>help you today?',
+    't-sub':'Send your request and our AI will classify and respond within seconds. For complex issues, a specialist will follow up.',
+    't-lbl-name':'Full name','t-lbl-email':'Email address',
+    't-lbl-subject':'Subject','t-lbl-message':'Message',
+    'submit-text':'Send Request','sending':'Sending...',
+    'name-ph':'John Smith','email-ph':'you@company.com',
+    'subj-ph':'Brief description of your issue',
+    'msg-ph':'Describe your issue in detail. The more context you provide, the better we can help.',
+    'ok-icon':'✓','ok-title':'Request received',
+    'ok-body':'Your ticket has been classified by our AI and a response has been sent to your email. Please check your inbox.',
+    'esc-icon':'⚡','esc-title':'Escalated to support team',
+    'esc-body':'Your request requires specialist attention. A member of our team will contact you within the estimated response time.',
+    'err-icon':'✗','err-title':'Connection error',
+    'err-body':'Could not reach the support system. Please try again in a moment.',
+    'req-fields':'Please fill in all required fields (Email, Subject and Message).',
+    't-f1':'AI-powered responses','t-f2':'Multi-language support',
+    't-f3':'Response via email','t-f4':'Secure & private',
+    'ticket-id':'Ticket ID'
+  },
+  es:{
+    't-status':'Sistema operacional',
+    't-eyebrow':'Soporte al Cliente',
+    't-title':'¿En qué podemos<br>ayudarte hoy?',
+    't-sub':'Enviá tu consulta y nuestra IA la clasificará y responderá en segundos. Para problemas complejos, un especialista te contactará.',
+    't-lbl-name':'Nombre completo','t-lbl-email':'Correo electrónico',
+    't-lbl-subject':'Asunto','t-lbl-message':'Mensaje',
+    'submit-text':'Enviar consulta','sending':'Enviando...',
+    'name-ph':'Juan García','email-ph':'vos@empresa.com',
+    'subj-ph':'Breve descripción del problema',
+    'msg-ph':'Describí tu problema en detalle. Cuanto más contexto des, mejor podemos ayudarte.',
+    'ok-icon':'✓','ok-title':'Consulta recibida',
+    'ok-body':'Tu ticket fue clasificado por nuestra IA y se envió una respuesta a tu email. Por favor revisá tu bandeja de entrada.',
+    'esc-icon':'⚡','esc-title':'Escalado al equipo de soporte',
+    'esc-body':'Tu consulta requiere atención especializada. Un miembro de nuestro equipo te contactará dentro del tiempo estimado.',
+    'err-icon':'✗','err-title':'Error de conexión',
+    'err-body':'No se pudo conectar al sistema de soporte. Por favor intentá de nuevo en un momento.',
+    'req-fields':'Completá los campos obligatorios (Email, Asunto y Mensaje).',
+    't-f1':'Respuestas con IA','t-f2':'Soporte multiidioma',
+    't-f3':'Respuesta por email','t-f4':'Seguro y privado',
+    'ticket-id':'Ticket ID'
+  }
+};
+
+let lang = 'en';
+const tr = k => T[lang][k] || T.en[k] || k;
+
+function setLang(l) {
+  lang = l;
+  document.getElementById('lang-en').classList.toggle('active', l==='en');
+  document.getElementById('lang-es').classList.toggle('active', l==='es');
+  document.documentElement.lang = l;
+  const simple = ['t-status','t-eyebrow','t-lbl-name','t-lbl-email','t-lbl-subject',
+    't-lbl-message','submit-text','t-f1','t-f2','t-f3','t-f4'];
+  simple.forEach(id => { const el=document.getElementById(id); if(el) el.textContent=tr(id); });
+  document.getElementById('t-title').innerHTML = tr('t-title');
+  document.getElementById('t-sub').textContent = tr('t-sub');
+  document.getElementById('field-name').placeholder    = tr('name-ph');
+  document.getElementById('field-from').placeholder    = tr('email-ph');
+  document.getElementById('field-subject').placeholder = tr('subj-ph');
+  document.getElementById('field-message').placeholder = tr('msg-ph');
+}
+
+async function submitTicket() {
+  const name    = document.getElementById('field-name').value.trim();
+  const from    = document.getElementById('field-from').value.trim();
+  const subject = document.getElementById('field-subject').value.trim();
+  const message = document.getElementById('field-message').value.trim();
+
+  if(!from || !subject || !message) {
+    showResult('error', tr('err-icon'), tr('err-title'), tr('req-fields'), '');
+    return;
+  }
+
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  document.getElementById('submit-text').textContent = tr('sending');
+  document.getElementById('submit-icon').textContent = '⋯';
+  document.getElementById('result-card').style.display = 'none';
+
+  try {
+    const res  = await fetch(WEBHOOK, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ source:'email', from, name, subject, message })
+    });
+    const data = await res.json();
+
+    if(data.status === 'auto-resolved') {
+      showResult('success', tr('ok-icon'), tr('ok-title'), tr('ok-body'), data.ticket_id);
+      ['field-name','field-from','field-subject','field-message']
+        .forEach(id => document.getElementById(id).value = '');
+    } else if(data.status === 'escalated') {
+      showResult('escalated', tr('esc-icon'), tr('esc-title'), tr('esc-body'), data.ticket_id);
+    } else {
+      showResult('error', tr('err-icon'), tr('err-title'), tr('err-body'), '');
+    }
+  } catch(e) {
+    showResult('error', tr('err-icon'), tr('err-title'), tr('err-body'), '');
+  }
+
+  btn.disabled = false;
+  document.getElementById('submit-text').textContent = tr('submit-text');
+  document.getElementById('submit-icon').textContent = '→';
+}
+
+function showResult(type, icon, title, body, tid) {
+  const c = document.getElementById('result-card');
+  c.className = 'result-card ' + type;
+  c.style.display = 'block';
+  document.getElementById('result-icon').textContent  = icon;
+  document.getElementById('result-title').textContent = title;
+  document.getElementById('result-body').textContent  = body;
+  document.getElementById('result-tid').textContent   = tid ? tr('ticket-id') + ': ' + tid : '';
+  c.scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+</script>
+</body>
+</html>

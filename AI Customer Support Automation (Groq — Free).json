@@ -1,0 +1,388 @@
+{
+  "name": "AI Customer Support Automation (Groq — Free)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "customer-support",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "7c35424e-d6fe-48a2-8cc0-7df64f8a0e19",
+      "name": "Webhook Trigger (Email/WhatsApp)",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        -1536,
+        288
+      ],
+      "webhookId": "cs-automation-webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $input.first().json.body \n  ? $input.first().json.body \n  : $input.first().json;\n\nconst normalized = {\n  source: body.source || 'webhook',\n  from: body.from || body.email || body.sender || 'unknown',\n  subject: body.subject || body.title || 'No Subject',\n  message: body.message || body.body || body.text || '',\n  timestamp: body.timestamp || new Date().toISOString(),\n  raw: body\n};\n\nreturn [{ json: normalized }];"
+      },
+      "id": "01bc5829-36aa-4a1f-a864-ab91f1bc1312",
+      "name": "Normalize Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1312,
+        288
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "condition-complex",
+              "leftValue": "={{ $json.classification.complexity }}",
+              "rightValue": "complex",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "condition-critical",
+              "leftValue": "={{ $json.classification.urgency }}",
+              "rightValue": "critical",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {
+          "looseTypeValidation": true
+        }
+      },
+      "id": "dca69322-0892-4a3d-bf07-2f2f4b6db00b",
+      "name": "Router: Needs Human?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -784,
+        288
+      ]
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0AL1JU7A8N",
+          "mode": "id"
+        },
+        "text": "=:rotating_light: *New {{ $json.classification.urgency === 'critical' ? 'CRITICAL' : 'Complex' }} Ticket Requires Attention*\n\n*Ticket ID:* `{{ $json.ticket_id }}`\n*From:* {{ $json.from }}\n*Category:* {{ $json.classification.category }}\n*Urgency:* {{ $json.classification.urgency.toUpperCase() }} {{ $json.classification.urgency === 'critical' ? ':fire:' : $json.classification.urgency === 'high' ? ':warning:' : ':information_source:' }}\n*Sentiment:* {{ $json.classification.sentiment }}\n*AI Model:* {{ $json.ai_model }}\n\n*Summary:* {{ $json.classification.summary }}\n\n*Original Message:*\n> {{ $json.message.substring(0, 300) }}{{ $json.message.length > 300 ? '...' : '' }}\n\n_Ticket saved to database. Please assign to a support agent._",
+        "otherOptions": {
+          "unfurl_links": false
+        }
+      },
+      "id": "d6f3fb92-919c-44a7-8d4e-1eb714eec648",
+      "name": "Slack: Alert Support Team",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.2,
+      "position": [
+        -272,
+        432
+      ],
+      "webhookId": "2ea37d65-5db1-4100-8853-66610fd34711",
+      "credentials": {
+        "slackApi": {
+          "id": "q79GbynyzQOhMGNp",
+          "name": "Slack account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const inputData = $input.first().json;\n\nconst autoResponse = inputData.auto_response || '';\n\nreturn [{\n  json: {\n    ...inputData,\n    auto_response: autoResponse,\n    response_type: 'automated'\n  }\n}];"
+      },
+      "id": "85a31c4d-08fe-4854-84b9-6d789c7f7fce",
+      "name": "Prepare Auto Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -288,
+        144
+      ]
+    },
+    {
+      "parameters": {
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "02577942-fed2-486b-971b-79d10f2a1cd3",
+      "name": "Respond: Automated",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        320,
+        144
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"success\": true,\n  \"ticket_id\": \"{{ $json.ticket_id }}\",\n  \"status\": \"escalated\",\n  \"message\": \"Your request has been escalated to our support team. A specialist will contact you shortly.\",\n  \"urgency\": \"{{ $json.classification.urgency }}\",\n  \"estimated_response\": \"{{ $json.classification.urgency === 'critical' ? '15 minutes' : $json.classification.urgency === 'high' ? '2 hours' : '24 hours' }}\"\n}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "3ee1f83b-aa54-4442-82b0-9683e0b10cab",
+      "name": "Respond: Escalated",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        -48,
+        432
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const inputData = $input.first().json;\n\nconst result = await new Promise((resolve, reject) => {\n  const https = require('https');\n  \n  const payload = JSON.stringify({\n    model: 'llama-3.3-70b-versatile',\n    temperature: 0.1,\n    max_tokens: 400,\n    messages: [\n      {\n        role: 'system',\n        content: 'You are an expert customer support classifier. Respond ONLY with a valid JSON object with these exact fields: category (one of: billing, technical, account, complaint, general, sales, refund, shipping), urgency (one of: low, medium, high, critical), sentiment (one of: positive, neutral, negative, very_negative), complexity (one of: simple, moderate, complex), language (ISO 639-1 code like en or es), summary (one sentence), needs_human (true or false), confidence (number 0 to 1). Return only the JSON object, no markdown, no explanation. Only set needs_human to true if: account is locked, payment failed and cannot be resolved automatically, legal threat, data loss, or customer explicitly demands human agent. Simple informational questions about billing, shipping status, or account settings should always be needs_human: false and complexity: simple.'\n      },\n      {\n        role: 'user',\n        content: `Subject: ${inputData.subject}\\nFrom: ${inputData.from}\\nMessage: ${inputData.message}`\n      }\n    ]\n  });\n\n  const options = {\n    hostname: 'api.groq.com',\n    path: '/openai/v1/chat/completions',\n    method: 'POST',\n    headers: {\n      'Authorization': 'Bearer YOUR_GROQ_API_KEY',\n      'Content-Type': 'application/json',\n      'Content-Length': Buffer.byteLength(payload)\n    }\n  };\n\n  const req = https.request(options, (res) => {\n    let data = '';\n    res.on('data', chunk => data += chunk);\n    res.on('end', () => resolve(JSON.parse(data)));\n  });\n\n  req.on('error', reject);\n  req.write(payload);\n  req.end();\n});\n\nconst content = result.choices[0].message.content;\n\nlet classification;\ntry {\n  classification = JSON.parse(content.replace(/```json|```/g, '').trim());\n} catch(e) {\n  classification = {\n    category: 'general',\n    urgency: 'medium',\n    sentiment: 'neutral',\n    complexity: 'moderate',\n    language: 'en',\n    summary: 'Unable to classify - requires human review',\n    needs_human: true,\n    confidence: 0\n  };\n}\n\nclassification.confidence = parseFloat(classification.confidence) || 0;\n\nreturn [{\n  json: {\n    ...inputData,\n    classification,\n    ticket_id: `TKT-${Date.now()}`,\n    processed_at: new Date().toISOString(),\n    ai_model: result.model\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1072,
+        288
+      ],
+      "id": "5a100f8e-d47d-4fed-ad93-590ef01382d2",
+      "name": "Groq: Classify Ticket"
+    },
+    {
+      "parameters": {
+        "jsCode": "const d = $input.first().json;\n\nconst https = require('https');\n\nconst payload = JSON.stringify({\n  model: 'llama-3.3-70b-versatile',\n  temperature: 0.7,\n  max_tokens: 500,\n  messages: [\n    {\n      role: 'system',\n      content: 'You are a professional, empathetic customer support agent. Write responses that are warm but professional, concise (max 150 words), solution-focused, and in the SAME LANGUAGE as the customer message. Always: 1) Acknowledge their issue, 2) Provide a clear solution or next steps, 3) End with a positive closing. Never make up policies or promise refunds without confirmation.'\n    },\n    {\n      role: 'user',\n      content: `Customer message:\\n${d.message}\\n\\nCategory: ${d.classification.category}\\nUrgency: ${d.classification.urgency}\\nLanguage: ${d.classification.language}\\nSummary: ${d.classification.summary}`\n    }\n  ]\n});\n\nconst GROQ_KEY = 'YOUR_GROQ_API_KEY';\n\nconst response = await new Promise((resolve, reject) => {\n  const req = https.request({\n    hostname: 'api.groq.com',\n    path: '/openai/v1/chat/completions',\n    method: 'POST',\n    headers: {\n      'Authorization': `Bearer ${GROQ_KEY}`,\n      'Content-Type': 'application/json',\n      'Content-Length': Buffer.byteLength(payload)\n    }\n  }, (res) => {\n    let data = '';\n    res.on('data', chunk => data += chunk);\n    res.on('end', () => resolve(JSON.parse(data)));\n  });\n  req.on('error', reject);\n  req.write(payload);\n  req.end();\n});\n\nconst autoResponse = response.choices[0].message.content;\n\nreturn [{ json: {\n  ...d,\n  auto_response: autoResponse\n}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -496,
+        144
+      ],
+      "id": "93a435ed-03eb-4d1c-b9b7-0551a5696f78",
+      "name": "Groq: Generate Response"
+    },
+    {
+      "parameters": {
+        "jsCode": "const d = $input.first().json;\n\nconst SUPABASE_REF = 'YOUR_SUPABASE_REF';\nconst SUPABASE_KEY = 'YOUR_SUPABASE_KEY';\n\nconst payload = JSON.stringify({\n  ticket_id: d.ticket_id,\n  source: d.source,\n  from_contact: d.from,\n  subject: d.subject,\n  message: d.message,\n  category: d.classification.category,\n  urgency: d.classification.urgency,\n  sentiment: d.classification.sentiment,\n  complexity: d.classification.complexity,\n  language: d.classification.language,\n  summary: d.classification.summary,\n  needs_human: d.classification.needs_human,\n  confidence_score: d.classification.confidence,\n  auto_response: d.auto_response || '',\n  status: 'auto-resolved',\n  auto_responded: true\n});\n\nconst https = require('https');\n\nawait new Promise((resolve, reject) => {\n  const req = https.request({\n    hostname: `${SUPABASE_REF}.supabase.co`,\n    path: '/rest/v1/tickets',\n    method: 'POST',\n    headers: {\n      'Content-Type': 'application/json',\n      'Content-Length': Buffer.byteLength(payload),\n      'apikey': SUPABASE_KEY,\n      'Authorization': `Bearer ${SUPABASE_KEY}`,\n      'Prefer': 'return=minimal'\n    }\n  }, (res) => {\n    let data = '';\n    res.on('data', chunk => data += chunk);\n    res.on('end', () => resolve(data));\n  });\n  req.on('error', reject);\n  req.write(payload);\n  req.end();\n});\n\nreturn [$input.first()];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -80,
+        144
+      ],
+      "id": "58488844-8a29-4cb0-825c-95e76cbedaf1",
+      "name": "Supabase: Save Auto Ticket"
+    },
+    {
+      "parameters": {
+        "jsCode": "const d = $input.first().json;\n\nconst RESEND_KEY = 'YOUR_RESEND_KEY';\n\nconst payload = JSON.stringify({\n  from: 'SupportOps AI <onboarding@resend.dev>',\n  to: [d.from],\n  subject: `Re: ${d.subject}`,\n  text: d.auto_response\n});\n\nconst https = require('https');\n\nawait new Promise((resolve, reject) => {\n  const req = https.request({\n    hostname: 'api.resend.com',\n    path: '/emails',\n    method: 'POST',\n    headers: {\n      'Authorization': `Bearer ${RESEND_KEY}`,\n      'Content-Type': 'application/json',\n      'Content-Length': Buffer.byteLength(payload)\n    }\n  }, (res) => {\n    let data = '';\n    res.on('data', chunk => data += chunk);\n    res.on('end', () => resolve(JSON.parse(data)));\n  });\n  req.on('error', reject);\n  req.write(payload);\n  req.end();\n});\n\nreturn [$input.first()];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        112,
+        144
+      ],
+      "id": "2b69f054-41c7-4d75-ba47-fb04736907be",
+      "name": "Resend: Send Email"
+    },
+    {
+      "parameters": {
+        "jsCode": "const d = $input.first().json;\n\nconst SUPABASE_REF = 'YOUR_SUPABASE_REF';\nconst SUPABASE_KEY = 'YOUR_SUPABASE_KEY';\n\nconst payload = JSON.stringify({\n  ticket_id: d.ticket_id,\n  source: d.source,\n  from_contact: d.from,\n  subject: d.subject,\n  message: d.message,\n  category: d.classification.category,\n  urgency: d.classification.urgency,\n  sentiment: d.classification.sentiment,\n  complexity: d.classification.complexity,\n  language: d.classification.language,\n  summary: d.classification.summary,\n  needs_human: d.classification.needs_human,\n  confidence_score: d.classification.confidence,\n  status: 'escalated',\n  auto_responded: false\n});\n\nconst https = require('https');\n\nawait new Promise((resolve, reject) => {\n  const req = https.request({\n    hostname: `${SUPABASE_REF}.supabase.co`,\n    path: '/rest/v1/tickets',\n    method: 'POST',\n    headers: {\n      'Content-Type': 'application/json',\n      'Content-Length': Buffer.byteLength(payload),\n      'apikey': SUPABASE_KEY,\n      'Authorization': `Bearer ${SUPABASE_KEY}`,\n      'Prefer': 'return=minimal'\n    }\n  }, (res) => {\n    let data = '';\n    res.on('data', chunk => data += chunk);\n    res.on('end', () => resolve(data));\n  });\n  req.on('error', reject);\n  req.write(payload);\n  req.end();\n});\n\nreturn [$input.first()];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -480,
+        432
+      ],
+      "id": "3ec0d944-d295-4178-bcf6-2df201ab0293",
+      "name": "Supabase: Save Escalated Ticket"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook Trigger (Email/WhatsApp)": {
+      "main": [
+        [
+          {
+            "node": "Normalize Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Input": {
+      "main": [
+        [
+          {
+            "node": "Groq: Classify Ticket",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Router: Needs Human?": {
+      "main": [
+        [
+          {
+            "node": "Supabase: Save Escalated Ticket",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Groq: Generate Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Auto Response": {
+      "main": [
+        [
+          {
+            "node": "Supabase: Save Auto Ticket",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Slack: Alert Support Team": {
+      "main": [
+        [
+          {
+            "node": "Respond: Escalated",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq: Classify Ticket": {
+      "main": [
+        [
+          {
+            "node": "Router: Needs Human?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq: Generate Response": {
+      "main": [
+        [
+          {
+            "node": "Prepare Auto Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase: Save Auto Ticket": {
+      "main": [
+        [
+          {
+            "node": "Resend: Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resend: Send Email": {
+      "main": [
+        [
+          {
+            "node": "Respond: Automated",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase: Save Escalated Ticket": {
+      "main": [
+        [
+          {
+            "node": "Slack: Alert Support Team",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "36484e15-f78d-4200-9f8b-2a9a0c37c11a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e48ed9dc7d901d6c23ce5cef0ac9a5d760c80669e7c12a6071ea96a71c0556fb"
+  },
+  "id": "1FishL77dGfBD36A",
+  "tags": [
+    {
+      "updatedAt": "2026-03-11T23:31:40.094Z",
+      "createdAt": "2026-03-11T23:31:40.094Z",
+      "id": "7kOell99CJA31vzj",
+      "name": "Customer Support"
+    },
+    {
+      "updatedAt": "2026-03-11T23:31:40.097Z",
+      "createdAt": "2026-03-11T23:31:40.097Z",
+      "id": "ONgP7Cixu2RwFCtf",
+      "name": "Portfolio"
+    },
+    {
+      "updatedAt": "2026-03-11T23:31:40.080Z",
+      "createdAt": "2026-03-11T23:31:40.080Z",
+      "id": "enCQre8s31haMxHL",
+      "name": "AI"
+    },
+    {
+      "updatedAt": "2026-03-11T23:31:40.101Z",
+      "createdAt": "2026-03-11T23:31:40.101Z",
+      "id": "fkQkAgVcsVnZOzgU",
+      "name": "Automation"
+    },
+    {
+      "updatedAt": "2026-03-11T23:42:52.755Z",
+      "createdAt": "2026-03-11T23:42:52.755Z",
+      "id": "m4KYS1Ob2fZszzxo",
+      "name": "Free"
+    },
+    {
+      "updatedAt": "2026-03-11T23:42:52.668Z",
+      "createdAt": "2026-03-11T23:42:52.668Z",
+      "id": "qY8c3sPjuWc5iKGr",
+      "name": "Groq"
+    }
+  ]
+}
