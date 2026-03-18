@@ -1,4 +1,4 @@
-# ⚡ AI Customer Support Automation
+#  AI Customer Support Automation
 
 > English · [Español](#-automatización-de-soporte-al-cliente-con-ia)
 
@@ -11,7 +11,7 @@
 
 ---
 
-## 🎯 What It Does
+##  What It Does
 
 A customer submits a support request through the web portal. Within **2 seconds**:
 
@@ -25,7 +25,7 @@ No human intervention required for ~74% of incoming tickets.
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 ```
 Customer Portal (customer-portal.html)
@@ -74,7 +74,7 @@ Agent Dashboard (agent-dashboard.html)
 
 ---
 
-## ✨ Key Features
+##  Key Features
 
 **AI Classification** — Every ticket is classified with 8 fields: category (billing, technical, account, complaint, general, sales, refund, shipping), urgency (low/medium/high/critical), sentiment (positive/neutral/negative/very_negative), complexity (simple/moderate/complex), language (ISO 639-1 auto-detection), one-sentence summary, needs_human flag, and confidence score.
 
@@ -90,7 +90,7 @@ Agent Dashboard (agent-dashboard.html)
 
 ---
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 | Tool | Role | Cost |
 |------|------|------|
@@ -107,7 +107,7 @@ Agent Dashboard (agent-dashboard.html)
 
 ---
 
-## 📁 Project Structure
+##  Project Structure
 
 ```
 ai-customer-support/
@@ -120,7 +120,7 @@ ai-customer-support/
 
 ---
 
-## 🚀 Setup
+##  Setup
 
 ### Prerequisites
 - Node.js v18+ — verify with `node --version`
@@ -192,7 +192,7 @@ Open `http://localhost:5678` — first run downloads ~400 MB, subsequent runs ar
 
 ---
 
-## 🧪 Testing
+##  Testing
 
 **Test 1 — Simple ticket (auto-resolved + email sent):**
 ```powershell
@@ -214,7 +214,7 @@ Invoke-RestMethod -Method POST -Uri "http://localhost:5678/webhook/customer-supp
 
 ---
 
-## 📊 Performance Metrics
+##  Performance Metrics
 
 | Metric | Value |
 |--------|-------|
@@ -227,7 +227,7 @@ Invoke-RestMethod -Method POST -Uri "http://localhost:5678/webhook/customer-supp
 
 ---
 
-## 🔮 Known Limitations & Roadmap
+##  Known Limitations & Roadmap
 
 **Current limitations:**
 - Inbound email replies are not yet handled. When a customer replies to the AI response, it reaches Resend's sandbox. Production requires a custom domain with inbound webhook configuration.
@@ -243,7 +243,7 @@ Invoke-RestMethod -Method POST -Uri "http://localhost:5678/webhook/customer-supp
 
 ---
 
-## 💡 Design Decisions
+##  Design Decisions
 
 **Why n8n over custom code?** n8n provides a visual workflow immediately understandable to non-technical stakeholders while allowing full customization via Code nodes. The automation logic is auditable, maintainable, and easy to extend.
 
@@ -255,7 +255,7 @@ Invoke-RestMethod -Method POST -Uri "http://localhost:5678/webhook/customer-supp
 
 ---
 
-# ⚡ Automatización de Soporte al Cliente con IA
+#  Automatización de Soporte al Cliente con IA
 
 > [English](#-ai-customer-support-automation) · Español
 
@@ -268,7 +268,7 @@ Invoke-RestMethod -Method POST -Uri "http://localhost:5678/webhook/customer-supp
 
 ---
 
-## 🎯 Qué hace
+##  Qué hace
 
 Un cliente envía una consulta a través del portal web. En menos de **2 segundos**:
 
@@ -282,7 +282,7 @@ No se requiere intervención humana en el ~74% de los tickets entrantes.
 
 ---
 
-## 🏗️ Arquitectura
+##  Arquitectura
 
 ```
 Portal del Cliente (customer-portal.html)
@@ -331,7 +331,7 @@ Dashboard de Agentes (agent-dashboard.html)
 
 ---
 
-## ✨ Funcionalidades Principales
+##  Funcionalidades Principales
 
 **Clasificación con IA** — Cada ticket se clasifica con 8 campos: categoría (billing, technical, account, complaint, general, sales, refund, shipping), urgencia (low/medium/high/critical), sentimiento (positive/neutral/negative/very_negative), complejidad (simple/moderate/complex), idioma (detección automática ISO 639-1), resumen en una oración, flag needs_human y score de confianza.
 
@@ -347,7 +347,7 @@ Dashboard de Agentes (agent-dashboard.html)
 
 ---
 
-## 🛠️ Stack Tecnológico
+##  Stack Tecnológico
 
 | Herramienta | Rol | Costo |
 |-------------|-----|-------|
@@ -364,7 +364,7 @@ Dashboard de Agentes (agent-dashboard.html)
 
 ---
 
-## 📁 Estructura del Proyecto
+##  Estructura del Proyecto
 
 ```
 ai-customer-support/
@@ -377,7 +377,7 @@ ai-customer-support/
 
 ---
 
-## 🚀 Instalación
+##  Instalación
 
 ### Prerequisitos
 - Node.js v18+ — verificar con `node --version`
@@ -449,7 +449,7 @@ Abrir `http://localhost:5678` — la primera vez descarga ~400 MB, las siguiente
 
 ---
 
-## 🧪 Testing
+##  Testing
 
 **Test 1 — Ticket simple (auto-resuelto + email enviado):**
 ```powershell
@@ -471,7 +471,7 @@ Invoke-RestMethod -Method POST -Uri "http://localhost:5678/webhook/customer-supp
 
 ---
 
-## 📊 Métricas de Performance
+##  Métricas de Performance
 
 | Métrica | Valor |
 |---------|-------|
@@ -500,7 +500,7 @@ Invoke-RestMethod -Method POST -Uri "http://localhost:5678/webhook/customer-supp
 
 ---
 
-## 💡 Decisiones de Diseño
+##  Decisiones de Diseño
 
 **¿Por qué n8n en lugar de código custom?** n8n provee un workflow visual inmediatamente comprensible para stakeholders no técnicos, mientras permite personalización completa via nodos Code. La lógica de automatización es auditable, mantenible y fácil de extender.
 
