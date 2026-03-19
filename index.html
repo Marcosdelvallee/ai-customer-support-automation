@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SupportOps AI</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700&family=DM+Mono:wght@300;400;500&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #080b0f;
+            --surface: #0e1318;
+            --border: #1e2d3d;
+            --accent: #00d4ff;
+            --green: #00e5a0;
+            --text: #ddeeff;
+            --text2: #7a92a8;
+            --text3: #3a5060;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* Grid background */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+            background-size: 44px 44px;
+            pointer-events: none;
+        }
+
+        /* Glow */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(0, 212, 255, 0.06) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 24px;
+        }
+
+        /* Logo */
+        .logo {
+            width: 64px;
+            height: 64px;
+            background: var(--accent);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin-bottom: 28px;
+            box-shadow: 0 0 40px rgba(0, 212, 255, 0.3);
+            animation: logoPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        }
+
+        @keyframes logoPop {
+            from {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .brand {
+            font-size: 13px;
+            font-family: 'DM Mono', monospace;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 16px;
+            animation: fadeUp 0.5s ease 0.2s both;
+        }
+
+        h1 {
+            font-size: 48px;
+            font-weight: 700;
+            letter-spacing: -2px;
+            line-height: 1.1;
+            margin-bottom: 16px;
+            animation: fadeUp 0.5s ease 0.3s both;
+        }
+
+        h1 span {
+            color: var(--accent);
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: var(--text2);
+            max-width: 480px;
+            line-height: 1.7;
+            margin-bottom: 48px;
+            animation: fadeUp 0.5s ease 0.4s both;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Buttons */
+        .buttons {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 56px;
+            animation: fadeUp 0.5s ease 0.5s both;
+        }
+
+        .btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 28px;
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #080b0f;
+            box-shadow: 0 0 24px rgba(0, 212, 255, 0.25);
+        }
+
+        .btn-primary:hover {
+            background: #22e0ff;
+            transform: translateY(-2px);
+            box-shadow: 0 0 36px rgba(0, 212, 255, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--surface);
+            color: var(--text2);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            border-color: rgba(0, 212, 255, 0.4);
+            color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .btn-icon {
+            font-size: 18px;
+        }
+
+        /* Stats */
+        .stats {
+            display: flex;
+            gap: 40px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 56px;
+            animation: fadeUp 0.5s ease 0.6s both;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -1px;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+
+        .stat-value.accent {
+            color: var(--accent);
+        }
+
+        .stat-value.green {
+            color: var(--green);
+        }
+
+        .stat-label {
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--text3);
+        }
+
+        .stat-sep {
+            width: 1px;
+            background: var(--border);
+            align-self: stretch;
+        }
+
+        /* Tech pills */
+        .tech-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+            animation: fadeUp 0.5s ease 0.7s both;
+        }
+
+        .tech-pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+            color: var(--text3);
+            letter-spacing: 0.5px;
+            transition: all 0.2s;
+        }
+
+        .tech-pill:hover {
+            border-color: rgba(0, 212, 255, 0.3);
+            color: var(--accent);
+        }
+
+        /* Loading bar */
+        .loader-wrap {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--border);
+            z-index: 10;
+        }
+
+        .loader-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--green));
+            width: 0%;
+            animation: load 2.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            box-shadow: 0 0 12px var(--accent);
+        }
+
+        @keyframes load {
+            0% {
+                width: 0%;
+            }
+
+            30% {
+                width: 45%;
+            }
+
+            60% {
+                width: 72%;
+            }
+
+            85% {
+                width: 91%;
+            }
+
+            100% {
+                width: 100%;
+            }
+        }
+
+        /* Footer */
+        .footer {
+            position: fixed;
+            bottom: 20px;
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+            color: var(--text3);
+            letter-spacing: 1px;
+            animation: fadeUp 0.5s ease 1s both;
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 32px;
+            }
+
+            .stats {
+                gap: 24px;
+            }
+
+            .stat-sep {
+                display: none;
+            }
+
+            .btn {
+                padding: 12px 22px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <div class="logo">⚡</div>
+
+        <div class="brand">SupportOps AI</div>
+
+        <h1>Customer Support,<br><span>Automated.</span></h1>
+
+        <p class="subtitle">
+            End-to-end AI automation that classifies, routes and responds to support tickets in under 2 seconds —
+            powered by Groq + Llama 3.3 70b. Free infrastructure, zero compromise.
+        </p>
+
+        <div class="buttons">
+            <a href="customer-portal.html" class="btn btn-primary">
+                <span class="btn-icon">📧</span>
+                Customer Portal
+            </a>
+            <a href="https://github.com/Marcosdelvallee/ai-customer-support-automation" target="_blank"
+                class="btn btn-secondary">
+                <span class="btn-icon">⭐</span>
+                View on GitHub
+            </a>
+        </div>
+
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-value green">~74%</div>
+                <div class="stat-label">Auto-Resolved</div>
+            </div>
+            <div class="stat-sep"></div>
+            <div class="stat">
+                <div class="stat-value accent">&lt; 2s</div>
+                <div class="stat-label">Response Time</div>
+            </div>
+            <div class="stat-sep"></div>
+            <div class="stat">
+                <div class="stat-value">8</div>
+                <div class="stat-label">Categories</div>
+            </div>
+            <div class="stat-sep"></div>
+            <div class="stat">
+                <div class="stat-value green">$0.00</div>
+                <div class="stat-label">Infra Cost</div>
+            </div>
+        </div>
+
+        <div class="tech-row">
+            <div class="tech-pill">⚡ n8n</div>
+            <div class="tech-pill">🤖 Groq + Llama 3.3 70b</div>
+            <div class="tech-pill">🐘 Supabase</div>
+            <div class="tech-pill">💬 Slack</div>
+            <div class="tech-pill">📧 Resend</div>
+            <div class="tech-pill">🆓 100% Free</div>
+        </div>
+
+    </div>
+
+    <div class="loader-wrap">
+        <div class="loader-bar" id="loader"></div>
+    </div>
+
+    <div class="footer">Built by Marcos Del Valle · Automation Engineer</div>
+
+    <script>
+        // After loader completes, keep it full
+        setTimeout(() => {
+            document.getElementById('loader').style.animation = 'none';
+            document.getElementById('loader').style.width = '100%';
+        }, 2500);
+    </script>
+
+</body>
+
+</html>
