@@ -1,317 +1,998 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SupportOps AI — Agent Dashboard</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
-<style>
-:root {
-  --bg:#f5f3ef; --surface:#fff; --surface2:#f0ede8;
-  --border:#e2ddd8; --border2:#d0c9c0;
-  --ink:#1a1714; --ink2:#6b6560; --ink3:#a09890;
-  --green:#1a7a4a; --green-bg:#e8f5ee;
-  --red:#c0392b; --red-bg:#fdf0ee;
-  --orange:#c45e00; --orange-bg:#fef3e8;
-  --yellow:#a07800; --yellow-bg:#fef9e7;
-  --blue:#1a4a8a; --blue-bg:#eef3fc;
-  --radius:12px;
-  --shadow:0 1px 3px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.04);
-  --shadow-lg:0 8px 40px rgba(0,0,0,.14),0 2px 8px rgba(0,0,0,.06);
-}
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;font-size:15px;line-height:1.6}
-
-/* NAV */
-nav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 40px;display:flex;align-items:center;justify-content:space-between;height:60px;position:sticky;top:0;z-index:100}
-.nav-logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:16px;letter-spacing:-.3px}
-.logo-mark{width:32px;height:32px;background:var(--ink);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--bg);font-size:16px}
-.nav-tag{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);padding:3px 8px;background:var(--surface2);border:1px solid var(--border);border-radius:4px}
-.nav-right{display:flex;align-items:center;gap:12px}
-.live-pill{display:flex;align-items:center;gap:6px;padding:5px 12px;background:var(--green-bg);border:1px solid #b8dfc8;border-radius:20px;font-size:12px;font-weight:500;color:var(--green)}
-.live-dot{width:7px;height:7px;background:var(--green);border-radius:50%;animation:blink 2s infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
-.refresh-btn{display:flex;align-items:center;gap:6px;padding:7px 14px;border:1px solid var(--border);border-radius:8px;background:var(--surface);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:var(--ink2);cursor:pointer;transition:all .15s}
-.refresh-btn:hover{border-color:var(--border2);color:var(--ink)}
-.last-updated{font-family:'DM Mono',monospace;font-size:11px;color:var(--ink3)}
-
-/* LAYOUT */
-.dash{max-width:1400px;margin:0 auto;padding:32px 40px 80px}
-
-/* KPIs */
-.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
-.kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow);transition:transform .15s;animation:fadeUp .4s ease both}
-.kpi-card:hover{transform:translateY(-2px)}
-.kpi-card:nth-child(1){animation-delay:.05s}.kpi-card:nth-child(2){animation-delay:.1s}
-.kpi-card:nth-child(3){animation-delay:.15s}.kpi-card:nth-child(4){animation-delay:.2s}
-@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-.kpi-label{font-family:'DM Mono',monospace;font-size:11px;color:var(--ink3);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
-.kpi-value{font-size:38px;font-weight:700;letter-spacing:-2px;line-height:1;margin-bottom:6px}
-.kpi-sub{font-size:12px;color:var(--ink3)}
-.kpi-sub .up{color:var(--green)}.kpi-sub .down{color:var(--red)}
-
-/* CARDS */
-.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:24px}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow)}
-.card-title{font-size:14px;font-weight:600;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between}
-.card-badge{font-family:'DM Mono',monospace;font-size:10px;color:var(--ink3);letter-spacing:1px;text-transform:uppercase}
-
-/* BARS */
-.bar-list{display:flex;flex-direction:column;gap:10px}
-.bar-row{display:flex;align-items:center;gap:10px}
-.bar-label{width:82px;flex-shrink:0;font-family:'DM Mono',monospace;font-size:10px;color:var(--ink2);text-transform:uppercase;letter-spacing:.5px}
-.bar-track{flex:1;height:6px;background:var(--surface2);border-radius:3px;overflow:hidden}
-.bar-fill{height:100%;border-radius:3px;transition:width .8s cubic-bezier(.4,0,.2,1)}
-.bar-count{font-family:'DM Mono',monospace;font-size:11px;color:var(--ink3);width:24px;text-align:right;flex-shrink:0}
-
-/* SENTIMENT */
-.sentiment-item{margin-bottom:13px}.sentiment-item:last-child{margin-bottom:0}
-.sentiment-header{display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px}
-.sentiment-label{color:var(--ink2);font-weight:500}
-.sentiment-pct{font-family:'DM Mono',monospace;color:var(--ink3);font-size:11px}
-.sentiment-track{height:6px;background:var(--surface2);border-radius:3px;overflow:hidden}
-.sentiment-fill{height:100%;border-radius:3px;transition:width .8s cubic-bezier(.4,0,.2,1)}
-
-/* BADGES */
-.badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:4px;font-family:'DM Mono',monospace;font-size:10px;font-weight:500;letter-spacing:.3px;text-transform:uppercase;border:1px solid}
-.badge-critical{background:var(--red-bg);color:var(--red);border-color:#e8b0a8}
-.badge-high{background:var(--orange-bg);color:var(--orange);border-color:#e8c098}
-.badge-medium{background:var(--yellow-bg);color:var(--yellow);border-color:#e8d898}
-.badge-low{background:var(--green-bg);color:var(--green);border-color:#a8d8b8}
-.badge-billing{background:var(--blue-bg);color:var(--blue);border-color:#b8cce8}
-.badge-technical{background:#f3eeff;color:#5a2d9a;border-color:#d0b8e8}
-.badge-account{background:var(--orange-bg);color:var(--orange);border-color:#e8c098}
-.badge-complaint{background:var(--red-bg);color:var(--red);border-color:#e8b0a8}
-.badge-general{background:var(--surface2);color:var(--ink2);border-color:var(--border2)}
-.badge-shipping{background:var(--green-bg);color:var(--green);border-color:#a8d8b8}
-.badge-refund{background:var(--yellow-bg);color:var(--yellow);border-color:#e8d898}
-.badge-sales{background:var(--blue-bg);color:var(--blue);border-color:#b8cce8}
-.status-auto{background:var(--green-bg);color:var(--green);border-color:#a8d8b8}
-.status-escalated{background:var(--orange-bg);color:var(--orange);border-color:#e8c098}
-.status-open{background:var(--yellow-bg);color:var(--yellow);border-color:#e8d898}
-
-/* TABLE */
-.table-wrap{overflow-x:auto}
-table{width:100%;border-collapse:collapse;font-size:13px}
-thead th{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);text-align:left;padding:10px 14px;border-bottom:1px solid var(--border);white-space:nowrap}
-tbody tr{border-bottom:1px solid var(--border);transition:background .1s;cursor:pointer}
-tbody tr:hover{background:var(--surface2)}
-tbody tr:last-child{border-bottom:none}
-tbody td{padding:12px 14px;vertical-align:middle}
-.td-id{font-family:'DM Mono',monospace;font-size:10px;color:var(--ink3);white-space:nowrap}
-.td-subject{font-weight:500;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.td-from{font-family:'DM Mono',monospace;font-size:11px;color:var(--ink2);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.td-time{font-family:'DM Mono',monospace;font-size:11px;color:var(--ink3);white-space:nowrap}
-
-/* LOADING / EMPTY */
-.loading-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:56px;color:var(--ink3);gap:12px}
-.spinner{width:22px;height:22px;border:2px solid var(--border);border-top-color:var(--ink);border-radius:50%;animation:spin .7s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.empty-state{text-align:center;padding:56px;color:var(--ink3)}
-.empty-icon{font-size:32px;margin-bottom:10px}
-.empty-text{font-size:14px}
-
-/* MODAL */
-.modal-overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(26,23,20,.55);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:24px}
-.modal-overlay.open{display:flex}
-.modal{background:var(--surface);border-radius:16px;box-shadow:var(--shadow-lg);width:100%;max-width:700px;max-height:90vh;overflow-y:auto;animation:modalIn .2s cubic-bezier(.34,1.56,.64,1)}
-@keyframes modalIn{from{opacity:0;transform:scale(.95) translateY(12px)}to{opacity:1;transform:scale(1) translateY(0)}}
-.modal-header{display:flex;align-items:flex-start;justify-content:space-between;padding:24px 28px 20px;border-bottom:1px solid var(--border)}
-.modal-title{font-size:18px;font-weight:700;letter-spacing:-.3px;max-width:560px}
-.modal-tid{font-family:'DM Mono',monospace;font-size:11px;color:var(--ink3);margin-top:4px}
-.modal-close{width:32px;height:32px;border:1px solid var(--border);border-radius:8px;background:var(--surface);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--ink2);flex-shrink:0;transition:all .15s;margin-left:16px}
-.modal-close:hover{background:var(--surface2);color:var(--ink)}
-.modal-body{padding:24px 28px}
-.modal-section{margin-bottom:24px}
-.modal-section:last-child{margin-bottom:0}
-.modal-section-title{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);margin-bottom:12px}
-.meta-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
-.meta-item{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 14px}
-.meta-key{font-family:'DM Mono',monospace;font-size:10px;color:var(--ink3);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
-.meta-val{font-size:14px;font-weight:500;text-transform:capitalize}
-.message-box{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:16px;font-size:14px;line-height:1.7;color:var(--ink2);white-space:pre-wrap;word-break:break-word}
-.response-box{background:var(--green-bg);border:1px solid #b8dfc8;border-radius:8px;padding:16px;font-size:14px;line-height:1.7;color:var(--ink);white-space:pre-wrap;word-break:break-word}
-.conf-wrap{display:flex;align-items:center;gap:12px}
-.conf-track{flex:1;height:8px;background:var(--border);border-radius:4px;overflow:hidden}
-.conf-fill{height:100%;border-radius:4px;background:var(--green);transition:width .8s cubic-bezier(.4,0,.2,1)}
-.conf-label{font-family:'DM Mono',monospace;font-size:13px;font-weight:500;color:var(--green);min-width:40px;text-align:right}
-.modal-footer{padding:16px 28px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
-.modal-ts{font-family:'DM Mono',monospace;font-size:11px;color:var(--ink3)}
-.modal-model{display:flex;align-items:center;gap:6px;padding:4px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;font-family:'DM Mono',monospace;font-size:10px;color:var(--ink2)}
-
-@media(max-width:1000px){
-  .kpi-grid{grid-template-columns:repeat(2,1fr)}
-  .grid-3{grid-template-columns:1fr}
-  .dash,nav{padding-left:20px;padding-right:20px}
-  .meta-grid{grid-template-columns:1fr 1fr}
-}
-</style>
-</head>
-<body>
-
-<nav>
-  <div class="nav-logo">
-    <div class="logo-mark">⚡</div>
-    <span>SupportOps AI</span>
-    <span class="nav-tag">Agent Dashboard</span>
-  </div>
-  <div class="nav-right">
-    <span class="last-updated" id="last-updated">—</span>
-    <button class="refresh-btn" onclick="loadDashboard()">↻ Refresh</button>
-    <div class="live-pill"><div class="live-dot"></div>Live</div>
-  </div>
-</nav>
-
-<div class="dash">
-
-  <!-- KPIs -->
-  <div class="kpi-grid" id="kpi-grid">
-    <div class="loading-wrap" style="grid-column:1/-1">
-      <div class="spinner"></div>
-      <span style="font-size:13px">Loading data...</span>
-    </div>
-  </div>
-
-  <!-- Charts -->
-  <div class="grid-3" id="charts-row" style="display:none">
-    <div class="card">
-      <div class="card-title">Categories<span class="card-badge">all time</span></div>
-      <div class="bar-list" id="cat-bars"></div>
-    </div>
-    <div class="card">
-      <div class="card-title">Sentiment<span class="card-badge">AI analysis</span></div>
-      <div id="sentiment-bars"></div>
-    </div>
-    <div class="card">
-      <div class="card-title">Urgency<span class="card-badge">distribution</span></div>
-      <div class="bar-list" id="urgency-bars"></div>
-    </div>
-  </div>
-
-  <!-- Table -->
-  <div class="card" id="tickets-card" style="display:none">
-    <div class="card-title">
-      Recent Tickets
-      <span class="card-badge" id="tickets-count">—</span>
-    </div>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Ticket ID</th>
-            <th>Subject</th>
-            <th>From</th>
-            <th>Category</th>
-            <th>Urgency</th>
-            <th>Status</th>
-            <th>Time</th>
-          </tr>
-        </thead>
-        <tbody id="tickets-tbody"></tbody>
-      </table>
-    </div>
-  </div>
-
-</div>
-
-<!-- TICKET DETAIL MODAL -->
-<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
-  <div class="modal">
-    <div class="modal-header">
-      <div>
-        <div class="modal-title" id="modal-title">—</div>
-        <div class="modal-tid"   id="modal-tid">—</div>
-      </div>
-      <button class="modal-close" onclick="closeModalDirect()">✕</button>
-    </div>
-    <div class="modal-body">
-
-      <div class="modal-section">
-        <div style="display:flex;gap:8px;flex-wrap:wrap" id="modal-badges"></div>
-      </div>
-
-      <div class="modal-section">
-        <div class="modal-section-title">AI Classification</div>
-        <div class="meta-grid" id="modal-meta"></div>
-      </div>
-
-      <div class="modal-section">
-        <div class="modal-section-title">AI Confidence</div>
-        <div class="conf-wrap">
-          <div class="conf-track"><div class="conf-fill" id="conf-fill"></div></div>
-          <span class="conf-label" id="conf-label">—</span>
-        </div>
-      </div>
-
-      <div class="modal-section" id="summary-section">
-        <div class="modal-section-title">AI Summary</div>
-        <div class="message-box" id="modal-summary"></div>
-      </div>
-
-      <div class="modal-section">
-        <div class="modal-section-title">Original Message</div>
-        <div class="message-box" id="modal-message"></div>
-      </div>
-
-      <div class="modal-section" id="response-section" style="display:none">
-        <div class="modal-section-title">AI Response Sent to Customer</div>
-        <div class="response-box" id="modal-response"></div>
-      </div>
-
-    </div>
-    <div class="modal-footer">
-      <div class="modal-ts" id="modal-ts">—</div>
-      <div class="modal-model">⚡ Groq · llama-3.3-70b-versatile</div>
-    </div>
-  </div>
-</div>
-
-<script>
-const SB_URL = 'https://YOUR_SUPABASE_REF.supabase.co';
-const SB_KEY = 'YOUR_SUPABASE_KEY';
-
-let ticketsCache = [];
-
-async function loadDashboard() {
-  document.getElementById('kpi-grid').innerHTML =
-    `<div class="loading-wrap" style="grid-column:1/-1"><div class="spinner"></div><span style="font-size:13px;color:var(--ink3)">Loading data...</span></div>`;
-  document.getElementById('charts-row').style.display  = 'none';
-  document.getElementById('tickets-card').style.display = 'none';
-
-  try {
-    const res = await fetch(
-      `${SB_URL}/rest/v1/tickets?select=*&order=created_at.desc&limit=100`,
-      { headers:{ 'apikey':SB_KEY, 'Authorization':`Bearer ${SB_KEY}` }}
-    );
-    const tks = await res.json();
-
-    if(!Array.isArray(tks) || tks.length === 0) {
-      document.getElementById('kpi-grid').innerHTML =
-        `<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">📭</div><div class="empty-text">No tickets yet.</div></div>`;
-      return;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SupportOps AI — Agent Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700&family=DM+Mono:wght@300;400;500&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f5f3ef;
+      --surface: #fff;
+      --surface2: #f0ede8;
+      --border: #e2ddd8;
+      --border2: #d0c9c0;
+      --ink: #1a1714;
+      --ink2: #6b6560;
+      --ink3: #a09890;
+      --green: #1a7a4a;
+      --green-bg: #e8f5ee;
+      --red: #c0392b;
+      --red-bg: #fdf0ee;
+      --orange: #c45e00;
+      --orange-bg: #fef3e8;
+      --yellow: #a07800;
+      --yellow-bg: #fef9e7;
+      --blue: #1a4a8a;
+      --blue-bg: #eef3fc;
+      --radius: 12px;
+      --shadow: 0 1px 3px rgba(0, 0, 0, .06), 0 4px 16px rgba(0, 0, 0, .04);
+      --shadow-lg: 0 8px 40px rgba(0, 0, 0, .14), 0 2px 8px rgba(0, 0, 0, .06);
     }
 
-    renderKPIs(tks);
-    renderCharts(tks);
-    renderTable(tks);
-    document.getElementById('charts-row').style.display  = 'grid';
-    document.getElementById('tickets-card').style.display = 'block';
-    document.getElementById('last-updated').textContent =
-      'Updated ' + new Date().toLocaleTimeString();
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box
+    }
 
-  } catch(e) {
-    document.getElementById('kpi-grid').innerHTML =
-      `<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">⚠️</div><div class="empty-text">Could not load data. Check Supabase connection.</div></div>`;
-  }
-}
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      min-height: 100vh;
+      font-size: 15px;
+      line-height: 1.6
+    }
 
-function renderKPIs(tks) {
-  const total  = tks.length;
-  const auto   = tks.filter(t => t.auto_responded).length;
-  const rate   = total > 0 ? Math.round(auto/total*100) : 0;
-  const crit   = tks.filter(t => t.urgency === 'critical').length;
-  document.getElementById('kpi-grid').innerHTML = `
+    /* NAV */
+    nav {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 60px;
+      position: sticky;
+      top: 0;
+      z-index: 100
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 16px;
+      letter-spacing: -.3px
+    }
+
+    .logo-mark {
+      width: 32px;
+      height: 32px;
+      background: var(--ink);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--bg);
+      font-size: 16px
+    }
+
+    .nav-tag {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--ink3);
+      padding: 3px 8px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 4px
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 12px
+    }
+
+    .live-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      background: var(--green-bg);
+      border: 1px solid #b8dfc8;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--green)
+    }
+
+    .live-dot {
+      width: 7px;
+      height: 7px;
+      background: var(--green);
+      border-radius: 50%;
+      animation: blink 2s infinite
+    }
+
+    @keyframes blink {
+
+      0%,
+      100% {
+        opacity: 1
+      }
+
+      50% {
+        opacity: .3
+      }
+    }
+
+    .refresh-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--ink2);
+      cursor: pointer;
+      transition: all .15s
+    }
+
+    .refresh-btn:hover {
+      border-color: var(--border2);
+      color: var(--ink)
+    }
+
+    .last-updated {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--ink3)
+    }
+
+    /* LAYOUT */
+    .dash {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 32px 40px 80px
+    }
+
+    /* KPIs */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px
+    }
+
+    .kpi-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: var(--shadow);
+      transition: transform .15s;
+      animation: fadeUp .4s ease both
+    }
+
+    .kpi-card:hover {
+      transform: translateY(-2px)
+    }
+
+    .kpi-card:nth-child(1) {
+      animation-delay: .05s
+    }
+
+    .kpi-card:nth-child(2) {
+      animation-delay: .1s
+    }
+
+    .kpi-card:nth-child(3) {
+      animation-delay: .15s
+    }
+
+    .kpi-card:nth-child(4) {
+      animation-delay: .2s
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(10px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    .kpi-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--ink3);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 10px
+    }
+
+    .kpi-value {
+      font-size: 38px;
+      font-weight: 700;
+      letter-spacing: -2px;
+      line-height: 1;
+      margin-bottom: 6px
+    }
+
+    .kpi-sub {
+      font-size: 12px;
+      color: var(--ink3)
+    }
+
+    .kpi-sub .up {
+      color: var(--green)
+    }
+
+    .kpi-sub .down {
+      color: var(--red)
+    }
+
+    /* CARDS */
+    .grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: var(--shadow)
+    }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between
+    }
+
+    .card-badge {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: var(--ink3);
+      letter-spacing: 1px;
+      text-transform: uppercase
+    }
+
+    /* BARS */
+    .bar-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px
+    }
+
+    .bar-row {
+      display: flex;
+      align-items: center;
+      gap: 10px
+    }
+
+    .bar-label {
+      width: 82px;
+      flex-shrink: 0;
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: var(--ink2);
+      text-transform: uppercase;
+      letter-spacing: .5px
+    }
+
+    .bar-track {
+      flex: 1;
+      height: 6px;
+      background: var(--surface2);
+      border-radius: 3px;
+      overflow: hidden
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width .8s cubic-bezier(.4, 0, .2, 1)
+    }
+
+    .bar-count {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--ink3);
+      width: 24px;
+      text-align: right;
+      flex-shrink: 0
+    }
+
+    /* SENTIMENT */
+    .sentiment-item {
+      margin-bottom: 13px
+    }
+
+    .sentiment-item:last-child {
+      margin-bottom: 0
+    }
+
+    .sentiment-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      margin-bottom: 5px
+    }
+
+    .sentiment-label {
+      color: var(--ink2);
+      font-weight: 500
+    }
+
+    .sentiment-pct {
+      font-family: 'DM Mono', monospace;
+      color: var(--ink3);
+      font-size: 11px
+    }
+
+    .sentiment-track {
+      height: 6px;
+      background: var(--surface2);
+      border-radius: 3px;
+      overflow: hidden
+    }
+
+    .sentiment-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width .8s cubic-bezier(.4, 0, .2, 1)
+    }
+
+    /* BADGES */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: .3px;
+      text-transform: uppercase;
+      border: 1px solid
+    }
+
+    .badge-critical {
+      background: var(--red-bg);
+      color: var(--red);
+      border-color: #e8b0a8
+    }
+
+    .badge-high {
+      background: var(--orange-bg);
+      color: var(--orange);
+      border-color: #e8c098
+    }
+
+    .badge-medium {
+      background: var(--yellow-bg);
+      color: var(--yellow);
+      border-color: #e8d898
+    }
+
+    .badge-low {
+      background: var(--green-bg);
+      color: var(--green);
+      border-color: #a8d8b8
+    }
+
+    .badge-billing {
+      background: var(--blue-bg);
+      color: var(--blue);
+      border-color: #b8cce8
+    }
+
+    .badge-technical {
+      background: #f3eeff;
+      color: #5a2d9a;
+      border-color: #d0b8e8
+    }
+
+    .badge-account {
+      background: var(--orange-bg);
+      color: var(--orange);
+      border-color: #e8c098
+    }
+
+    .badge-complaint {
+      background: var(--red-bg);
+      color: var(--red);
+      border-color: #e8b0a8
+    }
+
+    .badge-general {
+      background: var(--surface2);
+      color: var(--ink2);
+      border-color: var(--border2)
+    }
+
+    .badge-shipping {
+      background: var(--green-bg);
+      color: var(--green);
+      border-color: #a8d8b8
+    }
+
+    .badge-refund {
+      background: var(--yellow-bg);
+      color: var(--yellow);
+      border-color: #e8d898
+    }
+
+    .badge-sales {
+      background: var(--blue-bg);
+      color: var(--blue);
+      border-color: #b8cce8
+    }
+
+    .status-auto {
+      background: var(--green-bg);
+      color: var(--green);
+      border-color: #a8d8b8
+    }
+
+    .status-escalated {
+      background: var(--orange-bg);
+      color: var(--orange);
+      border-color: #e8c098
+    }
+
+    .status-open {
+      background: var(--yellow-bg);
+      color: var(--yellow);
+      border-color: #e8d898
+    }
+
+    /* TABLE */
+    .table-wrap {
+      overflow-x: auto
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px
+    }
+
+    thead th {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--ink3);
+      text-align: left;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap
+    }
+
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background .1s;
+      cursor: pointer
+    }
+
+    tbody tr:hover {
+      background: var(--surface2)
+    }
+
+    tbody tr:last-child {
+      border-bottom: none
+    }
+
+    tbody td {
+      padding: 12px 14px;
+      vertical-align: middle
+    }
+
+    .td-id {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: var(--ink3);
+      white-space: nowrap
+    }
+
+    .td-subject {
+      font-weight: 500;
+      max-width: 220px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap
+    }
+
+    .td-from {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--ink2);
+      max-width: 160px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap
+    }
+
+    .td-time {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--ink3);
+      white-space: nowrap
+    }
+
+    /* LOADING / EMPTY */
+    .loading-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 56px;
+      color: var(--ink3);
+      gap: 12px
+    }
+
+    .spinner {
+      width: 22px;
+      height: 22px;
+      border: 2px solid var(--border);
+      border-top-color: var(--ink);
+      border-radius: 50%;
+      animation: spin .7s linear infinite
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg)
+      }
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 56px;
+      color: var(--ink3)
+    }
+
+    .empty-icon {
+      font-size: 32px;
+      margin-bottom: 10px
+    }
+
+    .empty-text {
+      font-size: 14px
+    }
+
+    /* MODAL */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: rgba(26, 23, 20, .55);
+      backdrop-filter: blur(4px);
+      align-items: center;
+      justify-content: center;
+      padding: 24px
+    }
+
+    .modal-overlay.open {
+      display: flex
+    }
+
+    .modal {
+      background: var(--surface);
+      border-radius: 16px;
+      box-shadow: var(--shadow-lg);
+      width: 100%;
+      max-width: 700px;
+      max-height: 90vh;
+      overflow-y: auto;
+      animation: modalIn .2s cubic-bezier(.34, 1.56, .64, 1)
+    }
+
+    @keyframes modalIn {
+      from {
+        opacity: 0;
+        transform: scale(.95) translateY(12px)
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0)
+      }
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      padding: 24px 28px 20px;
+      border-bottom: 1px solid var(--border)
+    }
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -.3px;
+      max-width: 560px
+    }
+
+    .modal-tid {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--ink3);
+      margin-top: 4px
+    }
+
+    .modal-close {
+      width: 32px;
+      height: 32px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      color: var(--ink2);
+      flex-shrink: 0;
+      transition: all .15s;
+      margin-left: 16px
+    }
+
+    .modal-close:hover {
+      background: var(--surface2);
+      color: var(--ink)
+    }
+
+    .modal-body {
+      padding: 24px 28px
+    }
+
+    .modal-section {
+      margin-bottom: 24px
+    }
+
+    .modal-section:last-child {
+      margin-bottom: 0
+    }
+
+    .modal-section-title {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--ink3);
+      margin-bottom: 12px
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px
+    }
+
+    .meta-item {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 14px
+    }
+
+    .meta-key {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: var(--ink3);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 4px
+    }
+
+    .meta-val {
+      font-size: 14px;
+      font-weight: 500;
+      text-transform: capitalize
+    }
+
+    .message-box {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--ink2);
+      white-space: pre-wrap;
+      word-break: break-word
+    }
+
+    .response-box {
+      background: var(--green-bg);
+      border: 1px solid #b8dfc8;
+      border-radius: 8px;
+      padding: 16px;
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--ink);
+      white-space: pre-wrap;
+      word-break: break-word
+    }
+
+    .conf-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px
+    }
+
+    .conf-track {
+      flex: 1;
+      height: 8px;
+      background: var(--border);
+      border-radius: 4px;
+      overflow: hidden
+    }
+
+    .conf-fill {
+      height: 100%;
+      border-radius: 4px;
+      background: var(--green);
+      transition: width .8s cubic-bezier(.4, 0, .2, 1)
+    }
+
+    .conf-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--green);
+      min-width: 40px;
+      text-align: right
+    }
+
+    .modal-footer {
+      padding: 16px 28px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between
+    }
+
+    .modal-ts {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--ink3)
+    }
+
+    .modal-model {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: var(--ink2)
+    }
+
+    @media(max-width:1000px) {
+      .kpi-grid {
+        grid-template-columns: repeat(2, 1fr)
+      }
+
+      .grid-3 {
+        grid-template-columns: 1fr
+      }
+
+      .dash,
+      nav {
+        padding-left: 20px;
+        padding-right: 20px
+      }
+
+      .meta-grid {
+        grid-template-columns: 1fr 1fr
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <nav>
+    <div class="nav-logo">
+      <div class="logo-mark">⚡</div>
+      <span>SupportOps AI</span>
+      <span class="nav-tag">Agent Dashboard</span>
+    </div>
+    <div class="nav-right">
+      <span class="last-updated" id="last-updated">—</span>
+      <button class="refresh-btn" onclick="loadDashboard()">↻ Refresh</button>
+      <div class="live-pill">
+        <div class="live-dot"></div>Live
+      </div>
+    </div>
+  </nav>
+
+  <div class="dash">
+
+    <!-- KPIs -->
+    <div class="kpi-grid" id="kpi-grid">
+      <div class="loading-wrap" style="grid-column:1/-1">
+        <div class="spinner"></div>
+        <span style="font-size:13px">Loading data...</span>
+      </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="grid-3" id="charts-row" style="display:none">
+      <div class="card">
+        <div class="card-title">Categories<span class="card-badge">all time</span></div>
+        <div class="bar-list" id="cat-bars"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Sentiment<span class="card-badge">AI analysis</span></div>
+        <div id="sentiment-bars"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Urgency<span class="card-badge">distribution</span></div>
+        <div class="bar-list" id="urgency-bars"></div>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="card" id="tickets-card" style="display:none">
+      <div class="card-title">
+        Recent Tickets
+        <span class="card-badge" id="tickets-count">—</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Ticket ID</th>
+              <th>Subject</th>
+              <th>From</th>
+              <th>Category</th>
+              <th>Urgency</th>
+              <th>Status</th>
+              <th>Time</th>
+            </tr>
+          </thead>
+          <tbody id="tickets-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- TICKET DETAIL MODAL -->
+  <div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+    <div class="modal">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title" id="modal-title">—</div>
+          <div class="modal-tid" id="modal-tid">—</div>
+        </div>
+        <button class="modal-close" onclick="closeModalDirect()">✕</button>
+      </div>
+      <div class="modal-body">
+
+        <div class="modal-section">
+          <div style="display:flex;gap:8px;flex-wrap:wrap" id="modal-badges"></div>
+        </div>
+
+        <div class="modal-section">
+          <div class="modal-section-title">AI Classification</div>
+          <div class="meta-grid" id="modal-meta"></div>
+        </div>
+
+        <div class="modal-section">
+          <div class="modal-section-title">AI Confidence</div>
+          <div class="conf-wrap">
+            <div class="conf-track">
+              <div class="conf-fill" id="conf-fill"></div>
+            </div>
+            <span class="conf-label" id="conf-label">—</span>
+          </div>
+        </div>
+
+        <div class="modal-section" id="summary-section">
+          <div class="modal-section-title">AI Summary</div>
+          <div class="message-box" id="modal-summary"></div>
+        </div>
+
+        <div class="modal-section">
+          <div class="modal-section-title">Original Message</div>
+          <div class="message-box" id="modal-message"></div>
+        </div>
+
+        <div class="modal-section" id="response-section" style="display:none">
+          <div class="modal-section-title">AI Response Sent to Customer</div>
+          <div class="response-box" id="modal-response"></div>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <div class="modal-ts" id="modal-ts">—</div>
+        <div class="modal-model">⚡ Groq · llama-3.3-70b-versatile</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const SB_URL = ''; // handled by /api/tickets
+    const SB_KEY = ''; // handled by /api/tickets
+
+    let ticketsCache = [];
+
+    async function loadDashboard() {
+      document.getElementById('kpi-grid').innerHTML =
+        `<div class="loading-wrap" style="grid-column:1/-1"><div class="spinner"></div><span style="font-size:13px;color:var(--ink3)">Loading data...</span></div>`;
+      document.getElementById('charts-row').style.display = 'none';
+      document.getElementById('tickets-card').style.display = 'none';
+
+      try {
+        const res = await fetch("/api/tickets");
+
+
+
+
+        const tks = await res.json();
+
+        if (!Array.isArray(tks) || tks.length === 0) {
+          document.getElementById('kpi-grid').innerHTML =
+            `<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">📭</div><div class="empty-text">No tickets yet.</div></div>`;
+          return;
+        }
+
+        renderKPIs(tks);
+        renderCharts(tks);
+        renderTable(tks);
+        document.getElementById('charts-row').style.display = 'grid';
+        document.getElementById('tickets-card').style.display = 'block';
+        document.getElementById('last-updated').textContent =
+          'Updated ' + new Date().toLocaleTimeString();
+
+      } catch (e) {
+        document.getElementById('kpi-grid').innerHTML =
+          `<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">⚠️</div><div class="empty-text">Could not load data. Check Supabase connection.</div></div>`;
+      }
+    }
+
+    function renderKPIs(tks) {
+      const total = tks.length;
+      const auto = tks.filter(t => t.auto_responded).length;
+      const rate = total > 0 ? Math.round(auto / total * 100) : 0;
+      const crit = tks.filter(t => t.urgency === 'critical').length;
+      document.getElementById('kpi-grid').innerHTML = `
     <div class="kpi-card">
       <div class="kpi-label">Total Tickets</div>
       <div class="kpi-value">${total}</div>
@@ -330,145 +1011,146 @@ function renderKPIs(tks) {
     <div class="kpi-card">
       <div class="kpi-label">Critical Tickets</div>
       <div class="kpi-value" style="color:var(--red)">${crit}</div>
-      <div class="kpi-sub"><span class="${crit>0?'down':'up'}">${crit>0?'Needs attention':'All clear'}</span></div>
+      <div class="kpi-sub"><span class="${crit > 0 ? 'down' : 'up'}">${crit > 0 ? 'Needs attention' : 'All clear'}</span></div>
     </div>`;
-}
+    }
 
-function renderCharts(tks) {
-  const cC = { billing:'#1a4a8a',technical:'#5a2d9a',account:'#c45e00',complaint:'#c0392b',shipping:'#1a7a4a',general:'#a09890',refund:'#a07800',sales:'#1a4a8a' };
-  const cats = {};
-  tks.forEach(t => { if(t.category) cats[t.category] = (cats[t.category]||0)+1; });
-  const mxC = Math.max(...Object.values(cats), 1);
-  document.getElementById('cat-bars').innerHTML = Object.entries(cats)
-    .sort((a,b) => b[1]-a[1]).slice(0,6)
-    .map(([k,v]) => `
+    function renderCharts(tks) {
+      const cC = { billing: '#1a4a8a', technical: '#5a2d9a', account: '#c45e00', complaint: '#c0392b', shipping: '#1a7a4a', general: '#a09890', refund: '#a07800', sales: '#1a4a8a' };
+      const cats = {};
+      tks.forEach(t => { if (t.category) cats[t.category] = (cats[t.category] || 0) + 1; });
+      const mxC = Math.max(...Object.values(cats), 1);
+      document.getElementById('cat-bars').innerHTML = Object.entries(cats)
+        .sort((a, b) => b[1] - a[1]).slice(0, 6)
+        .map(([k, v]) => `
       <div class="bar-row">
         <span class="bar-label">${k}</span>
-        <div class="bar-track"><div class="bar-fill" style="width:${v/mxC*100}%;background:${cC[k]||'#a09890'}"></div></div>
+        <div class="bar-track"><div class="bar-fill" style="width:${v / mxC * 100}%;background:${cC[k] || '#a09890'}"></div></div>
         <span class="bar-count">${v}</span>
       </div>`).join('');
 
-  const sents = { positive:0, neutral:0, negative:0, very_negative:0 };
-  tks.forEach(t => { if(t.sentiment && sents[t.sentiment]!==undefined) sents[t.sentiment]++; });
-  const sC = { positive:'#1a7a4a', neutral:'#1a4a8a', negative:'#c45e00', very_negative:'#c0392b' };
-  const sL = { positive:'Positive', neutral:'Neutral', negative:'Negative', very_negative:'Very Negative' };
-  document.getElementById('sentiment-bars').innerHTML = Object.entries(sents).map(([k,v]) => `
+      const sents = { positive: 0, neutral: 0, negative: 0, very_negative: 0 };
+      tks.forEach(t => { if (t.sentiment && sents[t.sentiment] !== undefined) sents[t.sentiment]++; });
+      const sC = { positive: '#1a7a4a', neutral: '#1a4a8a', negative: '#c45e00', very_negative: '#c0392b' };
+      const sL = { positive: 'Positive', neutral: 'Neutral', negative: 'Negative', very_negative: 'Very Negative' };
+      document.getElementById('sentiment-bars').innerHTML = Object.entries(sents).map(([k, v]) => `
     <div class="sentiment-item">
       <div class="sentiment-header">
         <span class="sentiment-label">${sL[k]}</span>
-        <span class="sentiment-pct">${tks.length>0?Math.round(v/tks.length*100):0}%</span>
+        <span class="sentiment-pct">${tks.length > 0 ? Math.round(v / tks.length * 100) : 0}%</span>
       </div>
-      <div class="sentiment-track"><div class="sentiment-fill" style="width:${tks.length>0?v/tks.length*100:0}%;background:${sC[k]}"></div></div>
+      <div class="sentiment-track"><div class="sentiment-fill" style="width:${tks.length > 0 ? v / tks.length * 100 : 0}%;background:${sC[k]}"></div></div>
     </div>`).join('');
 
-  const urg = { critical:0, high:0, medium:0, low:0 };
-  tks.forEach(t => { if(t.urgency && urg[t.urgency]!==undefined) urg[t.urgency]++; });
-  const uC = { critical:'#c0392b', high:'#c45e00', medium:'#a07800', low:'#1a7a4a' };
-  const mxU = Math.max(...Object.values(urg), 1);
-  document.getElementById('urgency-bars').innerHTML = Object.entries(urg).map(([k,v]) => `
+      const urg = { critical: 0, high: 0, medium: 0, low: 0 };
+      tks.forEach(t => { if (t.urgency && urg[t.urgency] !== undefined) urg[t.urgency]++; });
+      const uC = { critical: '#c0392b', high: '#c45e00', medium: '#a07800', low: '#1a7a4a' };
+      const mxU = Math.max(...Object.values(urg), 1);
+      document.getElementById('urgency-bars').innerHTML = Object.entries(urg).map(([k, v]) => `
     <div class="bar-row">
       <span class="bar-label">${k}</span>
-      <div class="bar-track"><div class="bar-fill" style="width:${v/mxU*100}%;background:${uC[k]}"></div></div>
+      <div class="bar-track"><div class="bar-fill" style="width:${v / mxU * 100}%;background:${uC[k]}"></div></div>
       <span class="bar-count">${v}</span>
     </div>`).join('');
-}
+    }
 
-function renderTable(tks) {
-  ticketsCache = tks;
-  document.getElementById('tickets-count').textContent = tks.length + ' tickets';
-  const tbody = document.getElementById('tickets-tbody');
-  if(!tks.length) {
-    tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="empty-text">No tickets yet.</div></div></td></tr>`;
-    return;
-  }
-  tbody.innerHTML = tks.slice(0, 50).map((tk, i) => {
-    const st = tk.status||'open';
-    const sc = st==='auto-resolved'?'status-auto':st==='escalated'?'status-escalated':'status-open';
-    const sl = st==='auto-resolved'?'Auto-resolved':st==='escalated'?'Escalated':'Open';
-    return `<tr onclick="openTicket(${i})">
-      <td><span class="td-id">${esc(tk.ticket_id||'').slice(-12)}</span></td>
-      <td><span class="td-subject">${esc(tk.subject||'—')}</span></td>
-      <td><span class="td-from">${esc(tk.from_contact||'—')}</span></td>
-      <td><span class="badge badge-${tk.category||'general'}">${tk.category||'—'}</span></td>
-      <td><span class="badge badge-${tk.urgency||'low'}">${tk.urgency||'—'}</span></td>
+    function renderTable(tks) {
+      ticketsCache = tks;
+      document.getElementById('tickets-count').textContent = tks.length + ' tickets';
+      const tbody = document.getElementById('tickets-tbody');
+      if (!tks.length) {
+        tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="empty-text">No tickets yet.</div></div></td></tr>`;
+        return;
+      }
+      tbody.innerHTML = tks.slice(0, 50).map((tk, i) => {
+        const st = tk.status || 'open';
+        const sc = st === 'auto-resolved' ? 'status-auto' : st === 'escalated' ? 'status-escalated' : 'status-open';
+        const sl = st === 'auto-resolved' ? 'Auto-resolved' : st === 'escalated' ? 'Escalated' : 'Open';
+        return `<tr onclick="openTicket(${i})">
+      <td><span class="td-id">${esc(tk.ticket_id || '').slice(-12)}</span></td>
+      <td><span class="td-subject">${esc(tk.subject || '—')}</span></td>
+      <td><span class="td-from">${esc(tk.from_contact || '—')}</span></td>
+      <td><span class="badge badge-${tk.category || 'general'}">${tk.category || '—'}</span></td>
+      <td><span class="badge badge-${tk.urgency || 'low'}">${tk.urgency || '—'}</span></td>
       <td><span class="badge ${sc}">${sl}</span></td>
       <td><span class="td-time">${timeAgo(tk.created_at)}</span></td>
     </tr>`;
-  }).join('');
-}
+      }).join('');
+    }
 
-function openTicket(idx) {
-  const tk = ticketsCache[idx];
-  if(!tk) return;
-  const st = tk.status||'open';
-  const sc = st==='auto-resolved'?'status-auto':st==='escalated'?'status-escalated':'status-open';
-  const sl = st==='auto-resolved'?'Auto-resolved':st==='escalated'?'Escalated':'Open';
+    function openTicket(idx) {
+      const tk = ticketsCache[idx];
+      if (!tk) return;
+      const st = tk.status || 'open';
+      const sc = st === 'auto-resolved' ? 'status-auto' : st === 'escalated' ? 'status-escalated' : 'status-open';
+      const sl = st === 'auto-resolved' ? 'Auto-resolved' : st === 'escalated' ? 'Escalated' : 'Open';
 
-  document.getElementById('modal-title').textContent = tk.subject||'—';
-  document.getElementById('modal-tid').textContent   = tk.ticket_id||'—';
+      document.getElementById('modal-title').textContent = tk.subject || '—';
+      document.getElementById('modal-tid').textContent = tk.ticket_id || '—';
 
-  document.getElementById('modal-badges').innerHTML = `
+      document.getElementById('modal-badges').innerHTML = `
     <span class="badge ${sc}">${sl}</span>
     ${tk.category ? `<span class="badge badge-${tk.category}">${tk.category}</span>` : ''}
-    ${tk.urgency  ? `<span class="badge badge-${tk.urgency}">${tk.urgency}</span>` : ''}
-    <span class="badge" style="background:var(--surface2);color:var(--ink2);border-color:var(--border2)">📧 ${tk.source||'email'}</span>
+    ${tk.urgency ? `<span class="badge badge-${tk.urgency}">${tk.urgency}</span>` : ''}
+    <span class="badge" style="background:var(--surface2);color:var(--ink2);border-color:var(--border2)">📧 ${tk.source || 'email'}</span>
     ${tk.language ? `<span class="badge" style="background:var(--surface2);color:var(--ink2);border-color:var(--border2)">🌐 ${tk.language.toUpperCase()}</span>` : ''}`;
 
-  document.getElementById('modal-meta').innerHTML = `
-    <div class="meta-item"><div class="meta-key">From</div><div class="meta-val" style="font-size:13px">${esc(tk.from_contact||'—')}</div></div>
-    <div class="meta-item"><div class="meta-key">Sentiment</div><div class="meta-val">${tk.sentiment||'—'}</div></div>
-    <div class="meta-item"><div class="meta-key">Complexity</div><div class="meta-val">${tk.complexity||'—'}</div></div>
-    <div class="meta-item"><div class="meta-key">Needs Human</div><div class="meta-val">${tk.needs_human?'Yes':'No'}</div></div>
-    <div class="meta-item"><div class="meta-key">Auto Responded</div><div class="meta-val">${tk.auto_responded?'Yes ✓':'No'}</div></div>
-    <div class="meta-item"><div class="meta-key">Language</div><div class="meta-val">${tk.language||'—'}</div></div>`;
+      document.getElementById('modal-meta').innerHTML = `
+    <div class="meta-item"><div class="meta-key">From</div><div class="meta-val" style="font-size:13px">${esc(tk.from_contact || '—')}</div></div>
+    <div class="meta-item"><div class="meta-key">Sentiment</div><div class="meta-val">${tk.sentiment || '—'}</div></div>
+    <div class="meta-item"><div class="meta-key">Complexity</div><div class="meta-val">${tk.complexity || '—'}</div></div>
+    <div class="meta-item"><div class="meta-key">Needs Human</div><div class="meta-val">${tk.needs_human ? 'Yes' : 'No'}</div></div>
+    <div class="meta-item"><div class="meta-key">Auto Responded</div><div class="meta-val">${tk.auto_responded ? 'Yes ✓' : 'No'}</div></div>
+    <div class="meta-item"><div class="meta-key">Language</div><div class="meta-val">${tk.language || '—'}</div></div>`;
 
-  const conf = Math.round((tk.confidence_score||0)*100);
-  document.getElementById('conf-fill').style.width  = conf+'%';
-  document.getElementById('conf-label').textContent = conf+'%';
+      const conf = Math.round((tk.confidence_score || 0) * 100);
+      document.getElementById('conf-fill').style.width = conf + '%';
+      document.getElementById('conf-label').textContent = conf + '%';
 
-  if(tk.summary) {
-    document.getElementById('modal-summary').textContent = tk.summary;
-    document.getElementById('summary-section').style.display = 'block';
-  } else {
-    document.getElementById('summary-section').style.display = 'none';
-  }
+      if (tk.summary) {
+        document.getElementById('modal-summary').textContent = tk.summary;
+        document.getElementById('summary-section').style.display = 'block';
+      } else {
+        document.getElementById('summary-section').style.display = 'none';
+      }
 
-  document.getElementById('modal-message').textContent = tk.message||'—';
+      document.getElementById('modal-message').textContent = tk.message || '—';
 
-  if(tk.auto_response && tk.auto_response.trim()) {
-    document.getElementById('modal-response').textContent = tk.auto_response;
-    document.getElementById('response-section').style.display = 'block';
-  } else {
-    document.getElementById('response-section').style.display = 'none';
-  }
+      if (tk.auto_response && tk.auto_response.trim()) {
+        document.getElementById('modal-response').textContent = tk.auto_response;
+        document.getElementById('response-section').style.display = 'block';
+      } else {
+        document.getElementById('response-section').style.display = 'none';
+      }
 
-  document.getElementById('modal-ts').textContent =
-    tk.created_at ? new Date(tk.created_at).toLocaleString() : '—';
+      document.getElementById('modal-ts').textContent =
+        tk.created_at ? new Date(tk.created_at).toLocaleString() : '—';
 
-  document.getElementById('modal-overlay').classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
+      document.getElementById('modal-overlay').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
 
-function closeModal(e) { if(e.target===document.getElementById('modal-overlay')) closeModalDirect(); }
-function closeModalDirect() { document.getElementById('modal-overlay').classList.remove('open'); document.body.style.overflow=''; }
-document.addEventListener('keydown', e => { if(e.key==='Escape') closeModalDirect(); });
+    function closeModal(e) { if (e.target === document.getElementById('modal-overlay')) closeModalDirect(); }
+    function closeModalDirect() { document.getElementById('modal-overlay').classList.remove('open'); document.body.style.overflow = ''; }
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModalDirect(); });
 
-function timeAgo(iso) {
-  if(!iso) return '—';
-  const d = Math.floor((Date.now()-new Date(iso))/1000);
-  if(d<60) return d+'s'; if(d<3600) return Math.floor(d/60)+'m';
-  if(d<86400) return Math.floor(d/3600)+'h'; return Math.floor(d/86400)+'d';
-}
+    function timeAgo(iso) {
+      if (!iso) return '—';
+      const d = Math.floor((Date.now() - new Date(iso)) / 1000);
+      if (d < 60) return d + 's'; if (d < 3600) return Math.floor(d / 60) + 'm';
+      if (d < 86400) return Math.floor(d / 3600) + 'h'; return Math.floor(d / 86400) + 'd';
+    }
 
-function esc(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
+    function esc(s) {
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
 
-// Auto-refresh every 30s
-setInterval(loadDashboard, 30000);
+    // Auto-refresh every 30s
+    setInterval(loadDashboard, 30000);
 
-// Load on start
-loadDashboard();
-</script>
+    // Load on start
+    loadDashboard();
+  </script>
 </body>
+
 </html>
