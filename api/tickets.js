@@ -1,17 +1,27 @@
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-    const response = await fetch(
-        `${process.env.SUPABASE_URL}/rest/v1/tickets?select=*&order=created_at.desc&limit=100`,
-        {
-            headers: {
-                'apikey': process.env.SUPABASE_KEY,
-                'Authorization': `Bearer ${process.env.SUPABASE_KEY}`
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
+    }
+
+    try {
+        const response = await fetch(
+            `${process.env.SUPABASE_URL}/rest/v1/tickets?select=*&order=created_at.desc&limit=100`,
+            {
+                headers: {
+                    'apikey': process.env.SUPABASE_KEY,
+                    'Authorization': `Bearer ${process.env.SUPABASE_KEY}`
+                }
             }
-        }
-    );
+        );
 
-    const data = await response.json();
-    res.status(200).json(data);
+        const data = await response.json();
+        res.status(200).json(data);
+
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
 }
