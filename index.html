@@ -38,7 +38,6 @@
             overflow: hidden;
         }
 
-        /* Grid background */
         body::before {
             content: '';
             position: fixed;
@@ -50,7 +49,6 @@
             pointer-events: none;
         }
 
-        /* Glow */
         body::after {
             content: '';
             position: fixed;
@@ -73,7 +71,6 @@
             padding: 24px;
         }
 
-        /* Logo */
         .logo {
             width: 64px;
             height: 64px;
@@ -128,7 +125,7 @@
             color: var(--text2);
             max-width: 480px;
             line-height: 1.7;
-            margin-bottom: 48px;
+            margin-bottom: 40px;
             animation: fadeUp 0.5s ease 0.4s both;
         }
 
@@ -144,13 +141,12 @@
             }
         }
 
-        /* Buttons */
         .buttons {
             display: flex;
             gap: 14px;
             flex-wrap: wrap;
             justify-content: center;
-            margin-bottom: 56px;
+            margin-bottom: 16px;
             animation: fadeUp 0.5s ease 0.5s both;
         }
 
@@ -197,7 +193,32 @@
             font-size: 18px;
         }
 
-        /* Stats */
+        /* Demo note */
+        .demo-note {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 48px;
+            padding: 8px 16px;
+            background: rgba(0, 212, 255, 0.05);
+            border: 1px solid rgba(0, 212, 255, 0.12);
+            border-radius: 20px;
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+            color: var(--text3);
+            letter-spacing: 0.5px;
+            animation: fadeUp 0.5s ease 0.55s both;
+        }
+
+        .demo-note-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--accent);
+            border-radius: 50%;
+            opacity: 0.5;
+            flex-shrink: 0;
+        }
+
         .stats {
             display: flex;
             gap: 40px;
@@ -241,7 +262,6 @@
             align-self: stretch;
         }
 
-        /* Tech pills */
         .tech-row {
             display: flex;
             gap: 8px;
@@ -270,7 +290,6 @@
             color: var(--accent);
         }
 
-        /* Loading bar */
         .loader-wrap {
             position: fixed;
             bottom: 0;
@@ -311,7 +330,6 @@
             }
         }
 
-        /* Footer */
         .footer {
             position: fixed;
             bottom: 20px;
@@ -362,8 +380,13 @@
             </a>
             <a href="https://github.com/Marcosdelvallee/ai-customer-support-automation" target="_blank"
                 class="btn btn-secondary">
-                View on GitHub
+                ⭐ View on GitHub
             </a>
+        </div>
+
+        <div class="demo-note">
+            <div class="demo-note-dot"></div>
+            Live demo requires local n8n instance · Full setup & video in README
         </div>
 
         <div class="stats">
@@ -389,12 +412,12 @@
         </div>
 
         <div class="tech-row">
-            <div class="tech-pill"> n8n</div>
-            <div class="tech-pill"> Groq + Llama 3.3 70b</div>
-            <div class="tech-pill"> Supabase</div>
-            <div class="tech-pill"> Slack</div>
-            <div class="tech-pill"> Resend</div>
-            <div class="tech-pill"> 100% Free</div>
+            <div class="tech-pill">⚡ n8n</div>
+            <div class="tech-pill">🤖 Groq + Llama 3.3 70b</div>
+            <div class="tech-pill">🐘 Supabase</div>
+            <div class="tech-pill">💬 Slack</div>
+            <div class="tech-pill">📧 Resend</div>
+            <div class="tech-pill">🆓 100% Free</div>
         </div>
 
     </div>
@@ -406,7 +429,6 @@
     <div class="footer">Built by Marcos del Valle · Automation Engineer</div>
 
     <script>
-        // After loader completes, keep it full
         setTimeout(() => {
             document.getElementById('loader').style.animation = 'none';
             document.getElementById('loader').style.width = '100%';
