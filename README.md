@@ -234,12 +234,28 @@ Invoke-RestMethod -Method POST -Uri "http://localhost:5678/webhook/customer-supp
 - n8n runs locally via `npx`. For 24/7 availability, deploy to Railway or n8n Cloud.
 
 **Planned enhancements:**
-- [ ] Inbound email reply handling with custom domain
-- [ ] Vector embeddings + knowledge base for context-aware responses
-- [ ] SLA tracking and breach alerts
-- [ ] Agent assignment and ticket ownership workflow
-- [ ] Stripe webhook integration for automatic billing ticket creation
-- [ ] Fine-tuning classifier on historical ticket data
+The following enhancements are prioritized to evolve this MVP into a production-grade enterprise system:
+
+Phase 1: Resilience & Infrastructure (High Priority)
+Cloud Deployment: Migrate n8n from local npx to a 24/7 managed instance (such as Railway or n8n Cloud) to ensure permanent availability.
+
+Inbound Email Handling: Configure custom domain inbound processing in Resend to handle customer replies and maintain real-time conversation threads.
+
+Advanced Error Handling: Implement retry logic and fallback LLM models to ensure system uptime during API rate limits or provider downtime.
+
+Phase 2: Intelligence & Context (Medium Priority)
+RAG Integration: Connect a Knowledge Base via Vector Embeddings to provide context-aware responses based on internal company documentation.
+
+SLA Monitoring: Implement automatic triggers to alert supervisors via Slack if an escalated ticket remains unassigned for more than 15 minutes.
+
+Classifier Fine-tuning: Utilize historical ticket data stored in Supabase to further refine classification accuracy beyond the current 91%.
+
+Phase 3: Ecosystem Expansion (Low Priority)
+Stripe Integration: Connect billing webhooks to automatically fetch customer subscription data when a "Refund" or "Billing" ticket is detected.
+
+Agent Workspace: Extend the dashboard to allow agents to claim tickets, update statuses, and reply directly from the UI.
+
+Sentiment Trend Analysis: Real-time reporting on product satisfaction trends based on ticket sentiment over time.
 
 ---
 
@@ -491,12 +507,28 @@ Invoke-RestMethod -Method POST -Uri "http://localhost:5678/webhook/customer-supp
 - n8n corre localmente via `npx`. Para disponibilidad 24/7, deployar en Railway o n8n Cloud.
 
 **Mejoras planificadas:**
-- [ ] Manejo de respuestas entrantes por email con dominio propio
-- [ ] Vector embeddings + base de conocimiento para respuestas contextuales
-- [ ] Tracking de SLA y alertas por incumplimiento
-- [ ] Workflow de asignación de agentes y ownership de tickets
-- [ ] Integración con webhook de Stripe para tickets de billing automáticos
-- [ ] Fine-tuning del clasificador con datos históricos de tickets
+Las siguientes mejoras están priorizadas para evolucionar este MVP hacia un sistema de grado empresarial:
+
+Fase 1: Resiliencia e Infraestructura (Prioridad Alta)
+Despliegue en la Nube: Migrar n8n de la ejecución local npx a una instancia gestionada 24/7 (como Railway o n8n Cloud) para garantizar disponibilidad permanente.
+
+Manejo de Emails Entrantes: Configurar el procesamiento de entrada con dominio propio en Resend para gestionar respuestas de clientes y mantener hilos de conversación en tiempo real.
+
+Manejo de Errores Avanzado: Implementar lógica de reintentos y modelos de respaldo (fallback) para asegurar la operatividad ante límites de API o caídas de proveedores.
+
+Fase 2: Inteligencia y Contexto (Prioridad Media)
+Integración de RAG: Conectar una Base de Conocimientos mediante Vector Embeddings para ofrecer respuestas contextualizadas basadas en la documentación interna de la empresa.
+
+Monitoreo de SLA: Implementar disparadores automáticos para alertar a supervisores vía Slack si un ticket escalado no es asignado en más de 15 minutos.
+
+Ajuste del Clasificador: Utilizar los datos históricos almacenados en Supabase para refinar la precisión de la clasificación por encima del 91% actual.
+
+Fase 3: Expansión del Ecosistema (Prioridad Baja)
+Integración con Stripe: Conectar webhooks de facturación para obtener datos de suscripción del cliente automáticamente cuando se detecte un ticket de "Reembolso" o "Facturación".
+
+Workspace de Agentes: Extender el dashboard para permitir que los agentes tomen tickets, actualicen estados y respondan directamente desde la interfaz.
+
+Análisis de Tendencias de Sentimiento: Reportes en tiempo real sobre la satisfacción del producto basados en la evolución del sentimiento de los tickets en el tiempo.
 
 ---
 
